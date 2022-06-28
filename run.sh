@@ -1,0 +1,1 @@
+python3 train.py --train_data result_train --valid_data result_test --select_data / --batch_ratio 1 --Transformation TPS --FeatureExtraction ResNet --SequenceModeling BiLSTM --Prediction Attn --character "0123456789abcdefghijklmnopqrstuvwxyz\.\-\'"
