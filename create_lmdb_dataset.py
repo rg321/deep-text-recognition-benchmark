@@ -44,7 +44,9 @@ def createDataset(inputPath, gtFile, outputPath, checkValid=True):
 
     nSamples = len(datalist)
     for i in range(nSamples):
-        imagePath, label = datalist[i].strip('\n').split('\t')
+        # import pdb; pdb.set_trace()
+        # imagePath, label = datalist[i].strip('\n').split('\t')
+        imagePath, label = datalist[i].strip('\n').split()
         imagePath = os.path.join(inputPath, imagePath)
 
         # # only use alphanumeric data
