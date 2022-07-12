@@ -67,7 +67,8 @@ class Model(nn.Module):
         else:
             raise Exception('Prediction is neither CTC or Attn')
 
-    def forward(self, input, text, is_train=True):
+    # def forward(self, input, text, is_train=True):
+    def forward(self, input, is_train=True):
         """ Transformation stage """
         if not self.stages['Trans'] == "None":
             input = self.Transformation(input)
@@ -86,6 +87,10 @@ class Model(nn.Module):
         """ Prediction stage """
         if self.stages['Pred'] == 'CTC':
             prediction = self.Prediction(contextual_feature.contiguous())
+            # import pdb; pdb.set_trace()
+            # print('==================================')
+            # print(prediction.shape)
+            prediction = prediction.softmax(2).permute(0, 2, 1)
         else:
             prediction = self.Prediction(contextual_feature.contiguous(), text, is_train, batch_max_length=self.opt.batch_max_length)
 

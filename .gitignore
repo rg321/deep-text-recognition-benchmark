@@ -11,6 +11,7 @@
 *.zip
 *.eps
 *.pdf
+result_*
 
 ### Linux ###
 *~
