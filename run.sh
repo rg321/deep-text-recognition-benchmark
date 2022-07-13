@@ -8,9 +8,15 @@ timestamp=$mon${day}_$tim
 # echo $timestamp
 # echo results_$timestamp.txt
 
+gpu=0
+if [ $1 ]
+then
+	gpu=$1
+fi
 
+echo gpu $gpu
 
-python3 train.py --lr 0.001 --num_iter 5000 --train_data result_train_lettersOnly \
+CUDA_VISIBLE_DEVICES=$gpu python3 train.py --lr 0.001 --num_iter 5000 --train_data result_train_lettersOnly \
 --valid_data result_test_lettersOnly --select_data / --batch_ratio 1 \
 --Transformation None --FeatureExtraction VGG --SequenceModeling BiLSTM --Prediction CTC \
 --character "abcdefghijklmnopqrstuvwxyz" --valInterval 5 \
