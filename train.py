@@ -29,9 +29,11 @@ def non_zeroes(l):
 # exit()
 
 class ml(torch.nn.CTCLoss):
-    def __init__(self):
+    def __init__(self, **kwargs):
     # def __init__(self, batch_size):
-        super(ml, self).__init__()
+        super(ml, self).__init__(**kwargs)
+        # print('self.zero_infinity')
+        # print(self.zero_infinity)
         # self.batch_size = batch_size
     # def forward(self, inputs, targets, input_lengths, target_lengths):
     #   return super(ml, self).forward(inputs, targets, input_lengths, target_lengths)
@@ -123,7 +125,8 @@ def train(opt):
             criterion = CTCLoss()
         else:
             # criterion = torch.nn.CTCLoss(zero_infinity=True).to(device)
-            criterion = ml().to(device)
+            # criterion = ml().to(device)
+            criterion = ml(zero_infinity=True).to(device)
     else:
         criterion = torch.nn.CrossEntropyLoss(ignore_index=0).to(device)  # ignore [GO] token = ignore index 0
     # loss averager
