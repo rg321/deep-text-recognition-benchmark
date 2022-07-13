@@ -92,12 +92,12 @@ def train(opt):
 
     classifier = NeuralNetClassifier(model,
                                      # max_epochs=100,
-                                     criterion=torch.nn.CrossEntropyLoss,
+                                     criterion=nn.CTCLoss(zero_infinity=True),
                                      optimizer=torch.optim.Adam,
                                      train_split=None,
                                      verbose=1,
                                      device=device,
-                                     classes=classes,
+                                     # classes=classes,
                                      batch_size=192
                  )
 
