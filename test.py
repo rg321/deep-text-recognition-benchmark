@@ -107,7 +107,7 @@ def validation(model, criterion, evaluation_loader, converter, opt):
             if opt.baiduCTC:
                 cost = criterion(preds.permute(1, 0, 2), text_for_loss, preds_size, length_for_loss) / batch_size
             else:
-                cost = criterion(preds.log_softmax(2).permute(1, 0, 2), text_for_loss, preds_size, length_for_loss)
+                cost = criterion((preds.log_softmax(2).permute(1, 0, 2), text_for_loss), (preds_size, length_for_loss))
 
             # Select max probabilty (greedy decoding) then decode index to character
             if opt.baiduCTC:

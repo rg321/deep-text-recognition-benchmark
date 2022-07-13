@@ -19,6 +19,16 @@ from test import validation
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
+
+class ml(torch.nn.CTCLoss):
+    def __init__(self):
+        super(ml, self).__init__()
+    # def forward(self, inputs, targets, input_lengths, target_lengths):
+    #   return super(ml, self).forward(inputs, targets, input_lengths, target_lengths)
+    def forward(self, inputs, targets):
+        return super(ml, self).forward(*inputs, *targets)
+
+
 def train(opt):
     """ dataset preparation """
     if not opt.data_filtering_off:
@@ -94,7 +104,8 @@ def train(opt):
             from warpctc_pytorch import CTCLoss 
             criterion = CTCLoss()
         else:
-            criterion = torch.nn.CTCLoss(zero_infinity=True).to(device)
+            # criterion = torch.nn.CTCLoss(zero_infinity=True).to(device)
+            criterion = ml().to(device)
     else:
         criterion = torch.nn.CrossEntropyLoss(ignore_index=0).to(device)  # ignore [GO] token = ignore index 0
     # loss averager
@@ -146,7 +157,9 @@ def train(opt):
         # train part
         image_tensors, labels = train_dataset.get_batch()
         image = image_tensors.to(device)
+        # import pdb; pdb.set_trace()
         text, length = converter.encode(labels, batch_max_length=opt.batch_max_length)
+        # print('text ', )
         batch_size = image.size(0)
 
         if 'CTC' in opt.Prediction:
@@ -157,8 +170,12 @@ def train(opt):
                 cost = criterion(preds, text, preds_size, length) / batch_size
             else:
                 preds = preds.log_softmax(2).permute(1, 0, 2)
-                cost = criterion(preds, text, preds_size, length)
+# ==============================================================================================================                
+                cost = criterion((preds, text), (preds_size, length))
 
+
+
+# ==============================================================================================================                
         else:
             preds = model(image, text[:, :-1])  # align with Attention.forward
             target = text[:, 1:]  # without [GO] Symbol
