@@ -16,6 +16,7 @@ from utils import CTCLabelConverter, CTCLabelConverterForBaiduWarpctc, AttnLabel
 from dataset import hierarchical_dataset, AlignCollate, Batch_Balanced_Dataset
 from model import Model
 from test import validation
+from utils import ml # myloss i.e custom ctc loss
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 from skorch import NeuralNetClassifier
@@ -92,13 +93,16 @@ def train(opt):
 
     classifier = NeuralNetClassifier(model,
                                      # max_epochs=100,
-                                     criterion=nn.CTCLoss(zero_infinity=True),
+                                     criterion=ml(zero_infinity=True),
                                      optimizer=torch.optim.Adam,
                                      train_split=None,
                                      verbose=1,
                                      device=device,
                                      # classes=classes,
-                                     batch_size=192
+                                     batch_size=192,
+                                     lr=0.1,
+                                     max_epochs=1
+
                  )
 
 
@@ -194,7 +198,7 @@ def train(opt):
 
         learner = ActiveLearner(
             estimator=classifier,
-            X_training=image, y_training=text[:,1:],
+            X_training=image, y_training=text,
             # classes=classes, 
         )
 

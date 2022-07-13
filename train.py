@@ -77,40 +77,14 @@ def train(opt):
             continue
 
     # data parallel for multi-GPU
-    # model = torch.nn.DataParallel(model).to(device)
-    # model.to(device)
-
-    # ------------------------XXXXXXXXX-----------------------
-    # ------------------------XXXXXXXXX-----------------------
-
-    print(opt.character)
-    classes=list(opt.character)
-    classes.append(' ')
-    print('------- ', classes)
-
-    classifier = NeuralNetClassifier(model,
-                                     # max_epochs=100,
-                                     criterion=torch.nn.CrossEntropyLoss,
-                                     optimizer=torch.optim.Adam,
-                                     train_split=None,
-                                     verbose=1,
-                                     device=device,
-                                     classes=classes,
-                                     batch_size=192
-                 )
-
-
-    # ------------------------XXXXXXXXX-----------------------
-    # exit()
-    # model.train()
+    model = torch.nn.DataParallel(model).to(device)
+    model.train()
     if opt.saved_model != '':
         print(f'loading pretrained model from {opt.saved_model}')
         if opt.FT:
             model.load_state_dict(torch.load(opt.saved_model), strict=False)
         else:
             model.load_state_dict(torch.load(opt.saved_model))
-
-    print("model type ",type(model))
     print("Model:")
     print(model)
 
@@ -171,13 +145,8 @@ def train(opt):
     best_norm_ED = -1
     iteration = start_iter
 
-    
-
-    
-
     while(True):
         # train part
-        # import pdb; pdb.set_trace()
         image_tensors, labels = train_dataset.get_batch()
         image = image_tensors.to(device)
         # import pdb; pdb.set_trace()
@@ -185,32 +154,13 @@ def train(opt):
         # print('text ', )
         batch_size = image.size(0)
 
-        
-        # --------------------XXXXXXXXXXXX-------------------------------
-        # --------------------XXXXXXXXXXXX-------------------------------
-        
-        # exit()
-        # classes=
-        # import pdb; pdb.set_trace()
-
-        learner = ActiveLearner(
-            estimator=classifier,
-            X_training=image, y_training=text[:,1:],
-            # classes=classes, 
-        )
-
-        exit()
-        # --------------------XXXXXXXXXXXX-------------------------------
-
         if 'CTC' in opt.Prediction:
             preds = model(image, text)
-
             preds_size = torch.IntTensor([preds.size(1)] * batch_size)
             if opt.baiduCTC:
                 preds = preds.permute(1, 0, 2)  # to use CTCLoss format
                 cost = criterion(preds, text, preds_size, length) / batch_size
             else:
-                # import pdb; pdb.set_trace()
                 preds = preds.log_softmax(2).permute(1, 0, 2)
 # ==============================================================================================================                
                 # cost = criterion((preds, text), (preds_size, length))
