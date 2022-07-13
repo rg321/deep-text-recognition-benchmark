@@ -18,15 +18,33 @@ from model import Model
 from test import validation
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+def non_zeroes(l):
+    count = 0
+    for i in l:
+        if i !=0:
+            count+=1
+    return count
 
+# print(non_zeroes([1,2,0,0]))
+# exit()
 
 class ml(torch.nn.CTCLoss):
     def __init__(self):
+    # def __init__(self, batch_size):
         super(ml, self).__init__()
+        # self.batch_size = batch_size
     # def forward(self, inputs, targets, input_lengths, target_lengths):
     #   return super(ml, self).forward(inputs, targets, input_lengths, target_lengths)
     def forward(self, inputs, targets):
-        return super(ml, self).forward(*inputs, *targets)
+        # print('inputs size')
+        # print(inputs.shape)
+        inputs_length = [24]*inputs.shape[1]
+        # print('inputs_length')
+        # print(inputs_length)
+        targets_length = [non_zeroes(target) for target in targets]
+        # print('targets_length')
+        # print(targets_length)
+        return super(ml, self).forward(inputs, targets, inputs_length, targets_length)
 
 
 def train(opt):
@@ -171,7 +189,8 @@ def train(opt):
             else:
                 preds = preds.log_softmax(2).permute(1, 0, 2)
 # ==============================================================================================================                
-                cost = criterion((preds, text), (preds_size, length))
+                # cost = criterion((preds, text), (preds_size, length))
+                cost = criterion(preds, text)
 
 
 
